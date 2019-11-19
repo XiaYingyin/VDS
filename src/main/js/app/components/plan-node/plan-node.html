@@ -1,0 +1,89 @@
+<div class="plan-node"
+   [class.expanded]="showDetails"
+   [class.compact]="viewOptions.viewMode === viewModes.COMPACT"
+   [class.dot]="viewOptions.viewMode === viewModes.DOT">
+
+   <header (click)="showDetails = !showDetails" tooltip="view node details">
+      <h4>{{getNodeName()}}</h4>
+      <span *ngIf="viewOptions.viewMode === viewModes.FULL || showDetails">
+         <span class="node-duration">{{node[_planService.ACTUAL_DURATION_PROP] | duration}}<span class="text-muted">{{node[_planService.ACTUAL_DURATION_PROP] | durationUnit}}
+             | </span><strong>{{executionTimePercent}}</strong>
+            <span class="text-muted">%</span>
+         </span>
+      </span>
+   </header>
+
+   <button *ngIf="plan.query && viewOptions.viewMode === viewModes.FULL" tooltip="view corresponding query"
+      class="btn btn-sm btn-default btn-slim pull-right" (click)="showQuery = !showQuery">
+      <i class="fa fa-database"></i>
+   </button>
+
+   <div *ngIf="viewOptions.viewMode === viewModes.FULL">
+      <div class="relation-name" *ngIf="node[_planService.RELATION_NAME_PROP]">
+         <span class="text-muted">on </span>
+         <span *ngIf="node[_planService.SCHEMA_PROP]">{{node[_planService.SCHEMA_PROP]}}.</span>{{node[_planService.RELATION_NAME_PROP]}}
+         <span *ngIf="node[_planService.ALIAS_PROP]"> ({{node[_planService.ALIAS_PROP]}})</span>
+      </div>
+
+      <div class="relation-name" *ngIf="node[_planService.GROUP_KEY_PROP]">
+         <span class="text-muted">by</span> {{node[_planService.GROUP_KEY_PROP]}}</div>
+      <div class="relation-name" *ngIf="node[_planService.SORT_KEY_PROP]">
+         <span class="text-muted">by</span> {{node[_planService.SORT_KEY_PROP]}}</div>
+      <div class="relation-name" *ngIf="node[_planService.JOIN_TYPE_PROP]">{{node[_planService.JOIN_TYPE_PROP]}}
+         <span class="text-muted">join</span></div>
+      <div class="relation-name" *ngIf="node[_planService.INDEX_NAME_PROP]"><span class="text-muted">
+         using</span> {{node[_planService.INDEX_NAME_PROP]}}</div>
+      <div class="relation-name" *ngIf="node[_planService.HASH_CONDITION_PROP]"><span class="text-muted">
+         on</span> {{node[_planService.HASH_CONDITION_PROP]}}</div>
+      <div class="relation-name" *ngIf="node[_planService.CTE_NAME_PROP]">
+            <span class="text-muted">CTE</span> {{node[_planService.CTE_NAME_PROP]}}
+      </div>
+   </div>
+
+   <div class="tags" *ngIf="viewOptions.showTags && tags.length > 0">
+      <span *ngFor="#tag of tags">{{getTagName(tag)}}</span>
+   </div>
+
+   <div *ngIf="currentHighlightType !== highlightTypes.NONE">
+      <div class="node-bar-container">
+         <span class="node-bar" [style.width]="barWidth+'px'" [style.backgroundColor]="backgroundColor"></span>
+      </div>
+      <span class="node-bar-label" *ngIf="shouldShowNodeBarLabel()">
+         <span class="text-muted">{{viewOptions.highlightType}}:</span> {{highlightValue | number:'.0-2'}}
+      </span>
+   </div>
+
+   <div class="planner-estimate" *ngIf="shouldShowPlannerEstimate()">
+      <span *ngIf="plannerRowEstimateDirection === estimateDirections.over"><strong>over</strong> estimated rows</span>
+      <span *ngIf="plannerRowEstimateDirection === estimateDirections.under"><strong>under</strong> estimated rows</span>
+      <span> by <strong>{{plannerRowEstimateValue | number}}</strong>x</span>
+   </div>
+
+   <div *ngIf="showDetails">
+      <div *ngIf="getNodeTypeDescription()" class="node-description">
+         <span class="node-type">{{node[_planService.NODE_TYPE_PROP]}} Node</span> <span [innerHtml]="getNodeTypeDescription()"></span>
+      </div>
+
+      <table class="table prop-list">
+         <tr *ngFor="#prop of props">
+            <td width="40%">{{prop.key}}</td>
+            <td>{{prop.value}}</td>
+         <tr>
+      </table>
+      <div class="text-muted pad-top align-right"><em>*Pev calculated value</em></div>
+   </div>
+
+   <div *ngIf="showQuery" class="plan-query-container">
+      <button class="btn btn-close pull-right" (click)="showQuery = false">
+         <i class="fa fa-close"></i>
+      </button>
+      <h3>query</h3>
+      <pre class="plan-query-text"><code [innerHTML]="getFormattedQuery()"></code></pre>
+   </div>
+</div>
+
+<ul *ngIf="node.Plans">
+  <li *ngFor="#subNode of node.Plans">
+    <plan-node [plan]="plan" [node]="subNode" [viewOptions]="viewOptions" [planStats]="planStats"></plan-node>
+  </li>
+</ul>

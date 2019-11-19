@@ -1,0 +1,96 @@
+html {
+	height: 100%;
+}
+
+body {
+	font-size: $font-size-base;
+	font-weight: 300;
+	color: $text-color;
+	height: 100%;
+	width: 100%;
+	background-color: $bg-color;
+	line-height: $line-height-base;
+}
+
+strong {
+	font-weight: 600;
+}
+
+body, input, a, button, textarea {
+	font-family: $font-family-sans-serif;
+	font-weight: 300;
+}
+
+.text-muted {
+	color: $text-color-light;
+}
+
+.text-warning {
+   color: $alert-color;
+}
+
+.hero-container {
+   margin: $padding-lg * 3;
+   font-size: $font-size-xl;
+   text-align: center;
+}
+
+.pull-right {
+	float: right;
+}
+
+.align-right {
+   text-align: right;
+}
+
+a {
+	color: $link-color;
+	text-decoration: none;
+}
+
+.fa {
+	margin-right: $padding-sm;
+}
+
+.clickable {
+   cursor: pointer;
+}
+
+code, .code {
+   font-family: $font-family-mono;
+   font-weight: 600;
+}
+
+.pad-left {
+   margin-left: $padding-lg;
+}
+
+.pad-top {
+   margin-top: $padding-lg;
+}
+
+.pad-bottom {
+   margin-bottom: $padding-lg;
+}
+
+[tooltip]:before {
+    width: 150px;
+    text-transform: none;
+    text-align: left;
+    content: attr(tooltip);
+    position: absolute;
+    opacity: 0;
+    transition: all 0.15s ease;
+    padding: $padding-lg;
+    color: #fff;
+    border-radius: $border-radius-lg;
+    margin-top: -10px;
+    margin-left: 20px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+[tooltip]:hover:before {
+    opacity: 1;
+    background: $dark-blue;
+}
