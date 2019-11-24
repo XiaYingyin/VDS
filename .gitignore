@@ -37,3 +37,4 @@ lib
 test
 tools/typings/tsd
 tmp
+package-lock.json
