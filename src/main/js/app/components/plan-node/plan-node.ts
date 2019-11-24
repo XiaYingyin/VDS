@@ -1,5 +1,5 @@
 import {IPlan} from '../../interfaces/iplan';
-import {Component, OnInit} from 'angular2/core';
+import {Component} from 'angular2/core';
 import {HighlightType, EstimateDirection, ViewMode} from '../../enums';
 import {DurationPipe, DurationUnitPipe} from '../../pipes';
 
