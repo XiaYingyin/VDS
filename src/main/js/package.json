@@ -79,7 +79,6 @@
     "yargs": "^3.25.0"
   },
   "dependencies": {
-    "@angular/http": "^7.2.15",
     "angular2": "2.0.0-beta.0",
     "bootstrap": "^3.3.5",
     "es6-module-loader": "^0.17.8",
