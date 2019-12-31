@@ -67,6 +67,9 @@ package-lock.json
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# End of https://www.gitignore.io/api/java
 # target
 target/
+
+# System Files
+.DS_Store
+Thumbs.db
