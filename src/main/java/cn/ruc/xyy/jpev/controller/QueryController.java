@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5555")
+@CrossOrigin(origins = "http://localhost:4200")
 public class QueryController {
 	@Autowired
 	private JdbcTemplate jdbc;
@@ -22,6 +22,8 @@ public class QueryController {
 	public String getQueryPlan(@PathVariable("sql") String sql){
 		sql = "EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON)" + sql;
 		Object obj = jdbc.queryForList(sql);
-		return obj.toString();
+		String queryJSON = obj.toString().substring(2, obj.toString().length() - 2).replace("QUERY PLAN=", "");
+		
+		return queryJSON;
 	}
 }
