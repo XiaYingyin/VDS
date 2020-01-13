@@ -23,7 +23,14 @@ public class QueryController {
 		sql = "EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON)" + sql;
 		Object obj = jdbc.queryForList(sql);
 		String queryJSON = obj.toString().substring(2, obj.toString().length() - 2).replace("QUERY PLAN=", "");
-		
+		return queryJSON;
+	}
+	
+	@RequestMapping(value = "/query", method=RequestMethod.POST)
+	public String ngetQueryPlan(String query) {
+		query = "EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON) " + query;
+		Object obj = jdbc.queryForList(query);
+		String queryJSON = obj.toString().substring(2, obj.toString().length() - 2).replace("QUERY PLAN=", "");
 		return queryJSON;
 	}
 }
