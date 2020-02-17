@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://10.9.32.104:4200")
 public class ExtensionController {
 
 	public ExtensionController() {
@@ -20,12 +21,25 @@ public class ExtensionController {
 	private JdbcTemplate jdbc;
 
 	@RequestMapping(value ="/ext/list", method=RequestMethod.GET)
-	public String getQueryPlan(){
+	public String getExtList(){
 		String ls_exts = "SELECT e.extname AS \"Name\", e.extversion AS \"Version\", n.nspname AS \"Schema\", c.description AS \"Description\" "
 				+ "FROM pg_catalog.pg_extension e LEFT JOIN pg_catalog.pg_namespace n ON n.oid = e.extnamespace LEFT JOIN pg_catalog.pg_description c ON c.objoid = e.oid AND " 
 				+ "c.classoid = 'pg_catalog.pg_extension'::pg_catalog.regclass";
 		try {
 			Object obj = jdbc.queryForList(ls_exts);
+			return obj.toString();
+		} catch (DataAccessException de) {
+			return "Exception: " + de;
+		}
+	}
+
+	@RequestMapping(value ="/ext/{ext_name}", method=RequestMethod.GET)
+	public String getExtInfo(@PathVariable("ext_name") String ext_name) {
+		String ext_info = "SELECT e.extname AS \"Name\", e.extversion AS \"Version\", n.nspname AS \"Schema\", c.description AS \"Description\" "
+				+ "FROM pg_catalog.pg_extension e LEFT JOIN pg_catalog.pg_namespace n ON n.oid = e.extnamespace LEFT JOIN pg_catalog.pg_description c ON c.objoid = e.oid AND " 
+				+ "c.classoid = 'pg_catalog.pg_extension'::pg_catalog.regclass where e.extname = '" + ext_name + "'";
+		try {
+			Object obj = jdbc.queryForList(ext_info);
 			return obj.toString();
 		} catch (DataAccessException de) {
 			return "Exception: " + de;
