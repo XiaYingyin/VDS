@@ -41,3 +41,9 @@ And then run this sql query in jpev:
 ```
 SELECT count(*) FROM t_test, test WHERE t_test.x = test.x and sqrt(t_test.x) > 0 GROUP BY t_test.y;
 ```
+
+## Initialize
+
+```
+create table ext_type (extname name PRIMARY KEY, etype INT NOT NULL);
+```
