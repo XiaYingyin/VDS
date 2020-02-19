@@ -1,6 +1,8 @@
 package cn.ruc.xyy.jpev.controller;
 
 import cn.ruc.xyy.jpev.model.ExtensionItem;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,63 +30,57 @@ public class ExtensionController {
 	private JdbcTemplate jdbc;
 
 	@RequestMapping(value ="/extension/list", method=RequestMethod.GET)
-	public String getExtList(@RequestParam("type") String etype){
-		String ls_exts = "SELECT row_to_json(row) from (SELECT e.extname AS \"Name\", t.etype AS \"Type\", e.extversion AS \"Version\", n.nspname AS \"Schema\", c.description AS \"Description\" "
+	public List<ExtensionItem> getExtList(@RequestParam("type") String etype){
+		String ls_exts = "SELECT row_to_json(row) from (SELECT e.extname AS \"name\", t.etype AS \"type\", e.extversion AS \"version\", n.nspname AS \"schema\", c.description AS \"description\" "
 				+ "FROM pg_catalog.pg_extension e LEFT JOIN pg_catalog.pg_namespace n ON n.oid = e.extnamespace LEFT JOIN pg_catalog.pg_description c ON c.objoid = e.oid AND " 
 				+ "c.classoid = 'pg_catalog.pg_extension'::pg_catalog.regclass "
         		+ "LEFT JOIN ext_type t ON e.extname = t.extname "
         		+ "WHERE t.etype = " + etype + ") row";
     	if (Integer.parseInt(etype) == 0) {
-		  ls_exts = "SELECT row_to_json(row) from (SELECT e.extname AS \"Name\", t.etype AS \"Type\", e.extversion AS \"Version\", n.nspname AS \"Schema\", c.description AS \"Description\" "
+		  ls_exts = "SELECT row_to_json(row) from (SELECT e.extname AS \"name\", t.etype AS \"type\", e.extversion AS \"version\", n.nspname AS \"schema\", c.description AS \"description\" "
 				+ "FROM pg_catalog.pg_extension e LEFT JOIN pg_catalog.pg_namespace n ON n.oid = e.extnamespace LEFT JOIN pg_catalog.pg_description c ON c.objoid = e.oid AND " 
 				+ "c.classoid = 'pg_catalog.pg_extension'::pg_catalog.regclass "
         		+ "LEFT JOIN ext_type t ON e.extname = t.extname) row";
     	}
+		List<ExtensionItem> extList = new LinkedList<ExtensionItem>();
 		try {
 			List<Map<String, Object>> rstList = jdbc.queryForList(ls_exts);
-			StringBuffer jsonString = new StringBuffer();
-			jsonString.append("[");
+			ObjectMapper objectMapper = new ObjectMapper();
 			for (Map<String, Object> m : rstList) {
-				//System.out.println(m.get("row_to_json"));
-				ExtensionItem e = ((ExtensionItem) m.get("row_to_json"));
-				System.out.println(e.toString());
-				jsonString.append(m.get("row_to_json").toString() + ",");
+				ExtensionItem ei = objectMapper.readValue(m.get("row_to_json").toString(), ExtensionItem.class);
+				extList.add(ei);
 			}
-			if (jsonString.length() > 1)
-				jsonString.deleteCharAt(jsonString.length() - 1);
-			jsonString.append("]");
-			System.out.println(jsonString.toString());
-			return jsonString.toString();
 		} catch (DataAccessException de) {
-			return "Exception: " + de;
+			System.out.println("Exception: " + de);
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
 		}
+		return extList;
 	}
 
 	@RequestMapping(value ="/extension/list/{ext_name}", method=RequestMethod.GET)
-	public String getExtInfo(@PathVariable("ext_name") String ext_name) {
-		String ext_info = "SELECT row_to_json(row) from (SELECT e.extname AS \"Name\", t.etype AS \"Type\", e.extversion AS \"Version\", n.nspname AS \"Schema\", c.description AS \"Description\" "
+	public ExtensionItem getExtInfo(@PathVariable("ext_name") String ext_name) {
+		String ext_info = "SELECT row_to_json(row) from (SELECT e.extname AS \"name\", t.etype AS \"type\", e.extversion AS \"version\", n.nspname AS \"schema\", c.description AS \"description\" "
 				+ "FROM pg_catalog.pg_extension e LEFT JOIN pg_catalog.pg_namespace n ON n.oid = e.extnamespace LEFT JOIN pg_catalog.pg_description c ON c.objoid = e.oid AND " 
 				+ "c.classoid = 'pg_catalog.pg_extension'::pg_catalog.regclass "
-        + "LEFT JOIN ext_type t ON e.extname = t.extname "
-        + "where e.extname = '" + ext_name + "') row";
+        		+ "LEFT JOIN ext_type t ON e.extname = t.extname "
+        		+ "where e.extname = '" + ext_name + "') row";
+		ExtensionItem ext = new ExtensionItem();
 		try {
-			//Object obj = jdbc.queryForList(ext_info);
+			ObjectMapper objectMapper = new ObjectMapper();
 			List<Map<String, Object>> rstList = jdbc.queryForList(ext_info);
-			StringBuffer jsonString = new StringBuffer();
-			jsonString.append("[");
-			for (Map<String, Object> m : rstList) {
-				//System.out.println(m.get("row_to_json"));
-				jsonString.append(m.get("row_to_json").toString() + ",");
-			}
-			if (jsonString.length() > 1)
-				jsonString.deleteCharAt(jsonString.length() - 1);
-			jsonString.append("]");
-			System.out.println(jsonString.toString());
-			return jsonString.toString();
-			//return rst;
-		} catch (DataAccessException de) {
-			return "Exception: " + de;
+			ext = objectMapper.readValue(rstList.get(0).get("row_to_json").toString(), ExtensionItem.class);
+		} catch (DataAccessException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
 		}
+
+		return ext;
 	}
 
 	/*@RequestMapping(value ="/extension/list", method=RequestMethod.GET)
