@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -25,9 +26,9 @@ public class QueryController {
 		String queryJSON = obj.toString().substring(2, obj.toString().length() - 2).replace("QUERY PLAN=", "");
 		return queryJSON;
 	}
-	
-	@RequestMapping(value = "/query", method=RequestMethod.POST)
-	public String ngetQueryPlan(String query) {
+
+	@RequestMapping(value = "/query", method=RequestMethod.GET)
+	public String ngetQueryPlan(@RequestParam("query") String query) {
 		query = "EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON) " + query;
 		Object obj = jdbc.queryForList(query);
 		String queryJSON = obj.toString().substring(2, obj.toString().length() - 2).replace("QUERY PLAN=", "");
