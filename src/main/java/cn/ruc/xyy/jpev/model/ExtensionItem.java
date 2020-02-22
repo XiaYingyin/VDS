@@ -1,20 +1,10 @@
 package cn.ruc.xyy.jpev.model;
 
 public class ExtensionItem {
-    //@Id
-    //@Column(name = "Name")
     String name;
-
-    //@Column(name = "Type")
     int type;
-
-    //@Column(name = "Version")
     String version;
-
-    //@Column(name = "Schema")
     String schema;
-
-    //@Column(name = "Description")
     String description;
 
     public String getName() {

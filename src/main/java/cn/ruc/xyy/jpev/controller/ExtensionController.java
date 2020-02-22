@@ -1,6 +1,9 @@
 package cn.ruc.xyy.jpev.controller;
 
+import cn.ruc.xyy.jpev.model.BarChartData;
 import cn.ruc.xyy.jpev.model.ExtensionItem;
+import cn.ruc.xyy.jpev.service.BarChartDataService;
+import cn.ruc.xyy.jpev.util.TPCHTestProcess;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,13 +11,15 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +33,8 @@ public class ExtensionController {
 	}
 	@Autowired
 	private JdbcTemplate jdbc;
+	@Autowired
+	private BarChartDataService barChartDataService;
 
 	@RequestMapping(value ="/extension/list", method=RequestMethod.GET)
 	public List<ExtensionItem> getExtList(@RequestParam("type") String etype){
@@ -118,6 +125,54 @@ public class ExtensionController {
 		} catch (DataAccessException de) {
 			return "Exception: " + de;
 		}
+	}
+
+	@RequestMapping(value = "/extension/test/{name}", method = RequestMethod.GET)
+	public BarChartData getBarChartData(@PathVariable("name") String name){
+		BarChartData barChartData = new BarChartData();
+
+		try {
+			barChartData = barChartDataService.getBarChartDataByExtension(name);
+			//System.out.println("test");
+		} catch (NullPointerException e) {
+//			try {
+//				barChartData = TestExtension(name);
+//			} catch (IOException ex) {
+//				ex.printStackTrace();
+//			} catch (InterruptedException ex) {
+//				ex.printStackTrace();
+//			}
+			e.printStackTrace();
+		}
+
+//		if (barChartData == null) {
+//			//System.out.println("line 141");
+//			try {
+//				barChartData = TestExtension(name);
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
+
+		return barChartData;
+	}
+
+	@RequestMapping(value = "/extension/test", method = RequestMethod.GET)
+	public BarChartData TestExtension(@RequestParam("name") String name) throws IOException, InterruptedException {
+		// todo: execution test script
+		List<Double> simData = Arrays.asList(100.0, 16.9, 23.5, 45.7, 100.0, 19.0, 23.5, 45.7, 100.0, 60.0, 23.5, 45.7, 23.5, 45.7, 100.0, 90.0, 23.5, 45.7, 100.0, 78.0, 23.5, 45.7);
+		TPCHTestProcess ttp = new TPCHTestProcess();
+		simData = ttp.ExecuteTPCHTest(name);
+		BarChartData barChartData = new BarChartData(name, simData);
+		try {
+			barChartData = barChartDataService.saveBarChartData(barChartData);
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+		System.out.println(barChartData);
+		return barChartData;
 	}
 }
 
