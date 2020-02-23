@@ -25,7 +25,7 @@ public class TPCHTestProcess {
             sb.append(line).append("\n");
         }
         System.out.println(sb.toString());
-        String[] strArr = sb.toString().split(",");
+        String[] strArr = sb.toString().split(",|\\s");
         for (String s: strArr) {
             System.out.println(s);
             result.add(Double.parseDouble(s));

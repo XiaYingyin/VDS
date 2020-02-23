@@ -1,0 +1,1 @@
+explain analyse select * from test
