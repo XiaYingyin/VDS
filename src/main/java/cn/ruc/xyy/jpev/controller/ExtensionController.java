@@ -3,6 +3,7 @@ package cn.ruc.xyy.jpev.controller;
 import cn.ruc.xyy.jpev.model.BarChartData;
 import cn.ruc.xyy.jpev.model.ExtensionItem;
 import cn.ruc.xyy.jpev.service.BarChartDataService;
+import cn.ruc.xyy.jpev.util.NewTPCHTestProcess;
 import cn.ruc.xyy.jpev.util.TPCHTestProcess;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
