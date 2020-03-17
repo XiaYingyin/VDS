@@ -1,11 +1,40 @@
 package cn.ruc.xyy.jpev.model;
 
+import java.util.List;
+
 public class ExtensionItem {
     String name;
     int type;
     String version;
     String schema;
     String description;
+    List<String> functionList;
+    List<String> typeList;
+    List<String> operatorList;
+
+    public List<String> getFunctionList() {
+        return functionList;
+    }
+
+    public void setFunctionList(List<String> functionList) {
+        this.functionList = functionList;
+    }
+
+    public List<String> getTypeList() {
+        return typeList;
+    }
+
+    public void setTypeList(List<String> typeList) {
+        this.typeList = typeList;
+    }
+
+    public List<String> getOperatorList() {
+        return operatorList;
+    }
+
+    public void setOperatorList(List<String> operatorList) {
+        this.operatorList = operatorList;
+    }
 
     public String getName() {
         return name;
