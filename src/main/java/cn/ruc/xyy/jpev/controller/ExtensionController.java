@@ -10,15 +10,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -75,11 +71,34 @@ public class ExtensionController {
 				+ "c.classoid = 'pg_catalog.pg_extension'::pg_catalog.regclass "
         		+ "LEFT JOIN ext_type t ON e.extname = t.extname "
         		+ "where e.extname = '" + ext_name + "') row";
+		String ext_description = "SELECT pg_catalog.pg_describe_object(classid, objid, 0) AS \"object_desc\" " +
+				" FROM pg_catalog.pg_depend, pg_catalog.pg_extension e " +
+				"WHERE refclassid = 'pg_catalog.pg_extension'::pg_catalog.regclass AND refobjid = e.oid AND deptype = 'e' AND e.extname = '" + ext_name + "'";
 		ExtensionItem ext = new ExtensionItem();
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
 			List<Map<String, Object>> rstList = jdbc.queryForList(ext_info);
 			ext = objectMapper.readValue(rstList.get(0).get("row_to_json").toString(), ExtensionItem.class);
+
+			rstList = jdbc.queryForList(ext_description);
+
+			// parse result list
+			List<String> functionList = new LinkedList<String>();
+			List<String> operatorList = new LinkedList<String>();
+			List<String> typeList = new LinkedList<String>();
+			for (Map<String, Object> m: rstList) {
+				String buffer = m.get("object_desc").toString();
+				if (buffer.charAt(0) == 'f')
+					functionList.add(buffer);
+				if (buffer.charAt(0) == 'o')
+					operatorList.add(buffer);
+				if (buffer.charAt(0) == 't')
+					typeList.add(buffer);
+			}
+
+			ext.setFunctionList(functionList);
+			ext.setOperatorList(operatorList);
+			ext.setTypeList(typeList);
 		} catch (DataAccessException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
@@ -89,6 +108,13 @@ public class ExtensionController {
 		}
 
 		return ext;
+	}
+
+	@PatchMapping(value ="/extension/list/{ext_name}")
+	public void updateExtInfo(@PathVariable("ext_name") String ext_name, @RequestParam("description") String description) {
+		String update_extInfo = "update pg_catalog.pg_description set description = '" + description + "'" +
+				"where objoid = (select oid from pg_catalog.pg_extension where extname = '" + ext_name + "')";
+		jdbc.execute(update_extInfo);
 	}
 
 	/*@RequestMapping(value ="/extension/list", method=RequestMethod.GET)
@@ -174,6 +200,18 @@ public class ExtensionController {
 		}
 		System.out.println(barChartData);
 		return barChartData;
+	}
+
+	@DeleteMapping(value = "/extension/list/{name}")
+	public void deleteExt(@PathVariable("name") String name) {
+		String drop = "drop extension " + name;
+		try {
+			jdbc.execute(drop);
+			//System.out.println("delete success!");
+		} catch (DataAccessException de) {
+			//return "Exception: " + de;
+			de.printStackTrace();
+		}
 	}
 }
 
