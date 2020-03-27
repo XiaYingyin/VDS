@@ -4,12 +4,16 @@ import cn.ruc.xyy.jpev.model.FileNode;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import org.apache.commons.io.*;
+
 public class FileToolsTest {
     @Test
-    void executeTPCHTest() {
+    void executeTPCHTest() throws IOException {
         List<FileNode> fnt = new ArrayList<>();
         String maindirpath = "/Users/liuchaoyang/Documents/gitRepo/test";
 
@@ -30,7 +34,13 @@ public class FileToolsTest {
             FileTools.RecursiveScan(arr, 0, 0, fnt, 0);
         }
 
+//        try {
+//            FileTools.copyFile("/Users/liuchaoyang/Documents/gitRepo/t789/t789.c", "/Users/liuchaoyang/Documents/gitRepo/t789.c");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
+        FileUtils.copyDirectory(new File("/Users/liuchaoyang/Documents/gitRepo/t789/"), new File("/Users/liuchaoyang/Documents/gitRepo/"));
         System.out.println("=================print tree=================");
         FileTools.RecursivePrint(fnt);
         FileTools.createProject("function", "ftree2", "/Users/liuchaoyang/Documents/gitRepo/", "1.1", "This is demo.");

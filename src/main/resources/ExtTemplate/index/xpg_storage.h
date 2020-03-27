@@ -1,5 +1,0 @@
-#include "storage/condition_variable.h"
-#include "storage/indexfsm.h"
-#include "storage/ipc.h"
-#include "storage/lmgr.h"
-#include "storage/smgr.h"
