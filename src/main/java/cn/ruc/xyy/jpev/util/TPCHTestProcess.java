@@ -15,6 +15,7 @@ public class TPCHTestProcess {
     public List<Double> ExecuteTPCHTest(String name) throws InterruptedException, IOException {
         String shell_path="src/main/script/tpch_test.sh";
         List<Double> result = new ArrayList<Double>();
+		    System.out.println("Java Process Builder: execute test script.");
         Process ps = Runtime.getRuntime().exec(shell_path);
         ps.waitFor();
 
