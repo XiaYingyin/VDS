@@ -1,5 +1,5 @@
 #include "postgres.h"
-#include "exti.h"
+#include "header/exti.h"
 
 bool insertIndex(Relation rel, Datum *values, bool *isnull,
 		         ItemPointer ht_ctid, Relation heapRel,

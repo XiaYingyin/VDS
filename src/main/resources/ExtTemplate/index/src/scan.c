@@ -1,5 +1,5 @@
 #include "postgres.h"
-#include "exti.h"
+#include "header/exti.h"
 
 /*
  *	indexScanInit() -- start a scan on a index
