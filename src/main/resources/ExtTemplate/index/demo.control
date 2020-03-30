@@ -1,0 +1,4 @@
+comment = 'This is a demo'
+default_version = '1.0'
+module_pathname = '$libdir/demo'
+relocatable = true
