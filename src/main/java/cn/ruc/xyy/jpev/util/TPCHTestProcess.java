@@ -13,11 +13,13 @@ public class TPCHTestProcess {
     // create extension
     // use this extension
     public List<Double> ExecuteTPCHTest(String name) throws InterruptedException, IOException {
-        String shell_path="src/main/script/tpch_test.sh";
+        String shell_path="src/main/script/tpch_test.sh" + " " + name;
         List<Double> result = new ArrayList<Double>();
 		    System.out.println("Java Process Builder: execute test script.");
         Process ps = Runtime.getRuntime().exec(shell_path);
         ps.waitFor();
+
+        System.out.println(shell_path);
 
         BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));
         StringBuffer sb = new StringBuffer();
