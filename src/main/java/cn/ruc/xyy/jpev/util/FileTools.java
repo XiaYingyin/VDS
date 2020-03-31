@@ -90,15 +90,18 @@ public class FileTools {
 	}
 
 	public static boolean createProject(String type, String name, String path, String version, String description) {
-		path = path + name;
-		System.out.println(path);
+		path = path + '/' + name;
+
 		File file = new File(path);
 		if (!file.exists()) {
+			System.out.println("path not found: " + path);
 			file.mkdir();
 		}
 		try {
-			String
-					handler_name = name + "_handler";
+			ClassPathResource classPathResource = new ClassPathResource("ExtTemplate/index/");
+//			FileUtils.copyDirectory(classPathResource.getFile(), new File(path));
+			copy(classPathResource.getFile(), new File(path));
+			String handler_name = name + "_handler";
 			// sql file
 			String sql_info = "\\echo Use \"CREATE EXTENSION " + name + "\" to load this file. \\quit\n" +
 					"LOAD '$libdir/" + name + "';\n" +
@@ -122,13 +125,14 @@ public class FileTools {
 			control_bw.close();
 
 			// makefile
+
 			BufferedWriter makefile_bw = new BufferedWriter(new FileWriter(path + '/' + "Makefile"));
 			makefile_bw.write("EXTENSION = " + name + '\n');
 			makefile_bw.write("EXTVERSION = " + version + '\n');
 			makefile_bw.write("PG_CONFIG ?= pg_config" + '\n');
 			makefile_bw.write("MODULE_big = " + name + '\n');
 
-			makefile_bw.write("OBJS = " + name + ".o" + "insert.o scan.o delete.o cost.o compare.o build.o" + '\n');
+			makefile_bw.write("OBJS = src/" + name + ".o" + "src/insert.o src/scan.o src/delete.o src/cost.o src/compare.o src/build.o" + '\n');
 
 			String other_info = "DATA = $(wildcard *--*.sql)\n" +
 					"PGXS := $(shell $(PG_CONFIG) --pgxs)\n" +
@@ -138,9 +142,17 @@ public class FileTools {
 			makefile_bw.write(other_info);
 			makefile_bw.close();
 
-			ClassPathResource classPathResource = new ClassPathResource("ExtTemplate/index/");
-			FileUtils.copyDirectory(classPathResource.getFile(), new File(path));
+			// README
+			BufferedWriter readme_bw = new BufferedWriter(new FileWriter(path + '/' + "README.md"));
 
+
+			readme_bw.write("# " + name + '\n');
+			readme_bw.write(description + '\n');
+			readme_bw.close();
+
+			renameFile(path + "/src/ext_name.c", name + ".c", true);
+			replaceFileStr(path + "/src/" + name + ".c", "__handler__", name + "_handler");
+//			renameFile(path + "/src/ext_name.c", path + "/src/" + name + ".c", true);
 		}catch(IOException e){
 			e.printStackTrace();
 			return false;
@@ -163,6 +175,105 @@ public class FileTools {
 		} finally {
 			inputChannel.close();
 			outputChannel.close();
+		}
+	}
+
+	public static boolean replaceFileStr(String filepath, String sourceStr, String targetStr) {
+		try {
+			FileReader fis = new FileReader(filepath); // 创建文件输入流
+//			BufferedReader br = new BufferedReader(fis);
+			char[] data = new char[1024]; // 创建缓冲字符数组
+			int rn = 0;
+			StringBuilder sb = new StringBuilder(); // 创建字符串构建器
+			// fis.read(data)：将字符读入数组。在某个输入可用、发生 I/O
+			// 错误或者已到达流的末尾前，此方法一直阻塞。读取的字符数，如果已到达流的末尾，则返回 -1
+			while ((rn = fis.read(data)) > 0) { // 读取文件内容到字符串构建器
+				String str = String.valueOf(data, 0, rn);// 把数组转换成字符串
+//				System.out.println(str);
+				sb.append(str);
+			}
+			fis.close();// 关闭输入流
+			// 从构建器中生成字符串，并替换搜索文本
+			String str = sb.toString().replace(sourceStr, targetStr);
+			FileWriter fout = new FileWriter(filepath);// 创建文件输出流
+			fout.write(str.toCharArray());// 把替换完成的字符串写入文件内
+			fout.close();// 关闭输出流
+
+			return true;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+	}
+
+	public static boolean renameFile(String oldFilePath, String newFileName, boolean overriding){
+		File oldfile = new File(oldFilePath);
+		if(!oldfile.exists()){
+			return false;
+		}
+		String newFilepath = oldfile.getParent()+File.separator+newFileName;
+		File newFile = new File(newFilepath);
+		if(!newFile.exists()){
+			return oldfile.renameTo(newFile);
+		}else{
+			if(overriding){
+				newFile.delete();
+				return oldfile.renameTo(newFile);
+			}else{
+				return false;
+			}
+		}
+	}
+
+	public static void copy(File f1, File f2) throws IOException{
+		long totalSize = 0;
+		//如果目标不是目录，直接退出
+		if(!f2.isDirectory()){
+			return ;
+		}
+		//源文件是目录，循环所有子文件
+		if(f1.isDirectory()){
+			File[] subFiles = f1.listFiles();
+			for(int i=0;i<subFiles.length;i++){
+				String newFileName = f2.getPath()+"/"+subFiles[i].getName();
+				File newFile = new File(newFileName);
+				//子文件是目录则递归拷贝
+				if(subFiles[i].isDirectory()){
+					if(!newFile.exists()){
+						newFile.mkdir();
+					}else{
+					}
+					copy(subFiles[i], newFile);
+				}else{//子文件是文件，则直接拷贝
+					copy(subFiles[i],f2);
+				}
+			}
+		}else{//源文件是文件直接拷贝
+			String newFileName = f2.getPath()+"/"+f1.getName();
+			File newFile = new File(newFileName);
+			//是否覆盖拷贝
+            /*if(newFile.exists()){
+                return ;
+            }*/
+			newFile.createNewFile();
+			FileInputStream fis = new FileInputStream(f1);
+			BufferedInputStream bis = new BufferedInputStream(fis, 8192);
+			FileOutputStream fos = new FileOutputStream(newFileName);
+			BufferedOutputStream bos = new BufferedOutputStream(fos,8192);
+			byte[] b = new byte[8192];
+			int count = -1;
+			while((count=bis.read(b))!=-1){
+				totalSize += count;
+				bos.write(b,0,count);
+			}
+			bis.close();
+			bos.close();
+			fis.close();
+			fos.close();
 		}
 	}
 }

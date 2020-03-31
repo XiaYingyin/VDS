@@ -82,10 +82,10 @@ PG_MODULE_MAGIC;
  * index extension handler function: return IndexAmRoutine with access method parameters
  * and callbacks.
  */
-PG_FUNCTION_INFO_V1(demo_handler);
+PG_FUNCTION_INFO_V1(__handler__);
 
 Datum
-demo_handler(PG_FUNCTION_ARGS)
+__handler__(PG_FUNCTION_ARGS)
 {
 	IndexAmRoutine *amroutine = makeNode(IndexAmRoutine);
 

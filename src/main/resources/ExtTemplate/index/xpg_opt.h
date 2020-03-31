@@ -1,8 +1,0 @@
-#include "optimizer/clauses.h"
-#include "optimizer/cost.h"
-#include "optimizer/pathnode.h"
-#include "optimizer/paths.h"
-#include "optimizer/plancat.h"
-#include "optimizer/predtest.h"
-#include "optimizer/restrictinfo.h"
-#include "optimizer/var.h"
