@@ -97,13 +97,15 @@ public class FileTools {
 			file.mkdir();
 		}
 		try {
+			String
+					handler_name = name + "_handler";
 			// sql file
 			String sql_info = "\\echo Use \"CREATE EXTENSION " + name + "\" to load this file. \\quit\n" +
 					"LOAD '$libdir/" + name + "';\n" +
 					"\n" +
 					"CREATE OR REPLACE FUNCTION " + name + "_handler(internal) RETURNS index_am_handler AS\n" +
 					"'$libdir/" + name + "' LANGUAGE C; \n" +
-					"CREATE ACCESS METHOD " + name + " TYPE INDEX HANDLER " + name + "_handler;\n";
+					"CREATE ACCESS METHOD " + name + " TYPE INDEX HANDLER " + handler_name + "\n";
 			sql_info = sql_info + "-- Add new operators --\n";
 
 			BufferedWriter sql_bw = new BufferedWriter(new FileWriter(path + '/' + name + "--" + version + ".sql"));
@@ -111,8 +113,8 @@ public class FileTools {
 			sql_bw.close();
 
 			// control file
-			String control_info = "comment = " + description + "\n" +
-					              "default_version = " + version + "\n" +
+			String control_info = "comment = '" + description + "'\n" +
+					              "default_version = '" + version + "'\n" +
 					              "module_pathname = '$libdir/" + name + "'\n" +
 					              "relocatable = true";
 			BufferedWriter control_bw = new BufferedWriter(new FileWriter(path + '/' + name + ".control"));
@@ -126,7 +128,7 @@ public class FileTools {
 			makefile_bw.write("PG_CONFIG ?= pg_config" + '\n');
 			makefile_bw.write("MODULE_big = " + name + '\n');
 
-			makefile_bw.write("OBJS = name.o" + '\n');
+			makefile_bw.write("OBJS = " + name + ".o" + "insert.o scan.o delete.o cost.o compare.o build.o" + '\n');
 
 			String other_info = "DATA = $(wildcard *--*.sql)\n" +
 					"PGXS := $(shell $(PG_CONFIG) --pgxs)\n" +
