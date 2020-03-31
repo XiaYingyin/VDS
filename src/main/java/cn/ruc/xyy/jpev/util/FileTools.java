@@ -132,7 +132,7 @@ public class FileTools {
 			makefile_bw.write("PG_CONFIG ?= pg_config" + '\n');
 			makefile_bw.write("MODULE_big = " + name + '\n');
 
-			makefile_bw.write("OBJS = src/" + name + ".o" + "src/insert.o src/scan.o src/delete.o src/cost.o src/compare.o src/build.o" + '\n');
+			makefile_bw.write("OBJS = src/" + name + ".o " + "src/insert.o src/scan.o src/delete.o src/cost.o src/compare.o src/build.o" + '\n');
 
 			String other_info = "DATA = $(wildcard *--*.sql)\n" +
 					"PGXS := $(shell $(PG_CONFIG) --pgxs)\n" +
