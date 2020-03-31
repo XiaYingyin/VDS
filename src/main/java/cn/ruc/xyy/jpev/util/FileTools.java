@@ -91,6 +91,7 @@ public class FileTools {
 
 	public static boolean createProject(String type, String name, String path, String version, String description) {
 		path = path + '/' + name;
+		name = name.toLowerCase();
 
 		File file = new File(path);
 		if (!file.exists()) {
