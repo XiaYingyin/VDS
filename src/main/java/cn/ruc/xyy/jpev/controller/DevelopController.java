@@ -1,11 +1,14 @@
 package cn.ruc.xyy.jpev.controller;
 
+import cn.ruc.xyy.jpev.model.BuildInfo;
 import cn.ruc.xyy.jpev.model.FileInfo;
 import cn.ruc.xyy.jpev.model.ProjectInfo;
+import cn.ruc.xyy.jpev.util.BuildProcess;
 import cn.ruc.xyy.jpev.util.FileTools;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import cn.ruc.xyy.jpev.model.FileNode;
@@ -68,4 +71,24 @@ public class DevelopController {
     }
 
 
+    @RequestMapping(value = "/develop/build", method = RequestMethod.GET)
+    public BuildInfo buildProject(@RequestParam("path") String path) {
+        String rst = BuildProcess.buildProject(path);
+        System.out.println(rst);
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        BuildInfo bi = new BuildInfo(df.format(new Date()), rst);
+        return bi;
+    }
+
+    @RequestMapping(value = "/develop/install/{name}", method = RequestMethod.GET)
+    public String installExtension(@RequestParam("path") String path, @PathVariable("name") String name) {
+        String rst = BuildProcess.installExtension(path, name);
+        System.out.println(rst);
+        return rst;
+    }
+
+    @RequestMapping(value = "/develop/file/{name}", method = RequestMethod.GET)
+    public String createFile(@RequestParam("path") String path, @PathVariable("name") String name) {
+        return FileTools.createFile(path, name);
+    }
 }

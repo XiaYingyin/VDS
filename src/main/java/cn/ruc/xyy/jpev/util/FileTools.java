@@ -277,4 +277,15 @@ public class FileTools {
 			fos.close();
 		}
 	}
+
+	public static String createFile(String path, String name) {
+		String newFileName = path + "/" + name;
+		File newFile = new File(newFileName);
+		try {
+			newFile.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "Create success!";
+	}
 }
