@@ -21,6 +21,7 @@ public class DevelopController {
         return "Hello, develop!";
     }
 
+    // 用于扫描工程路径
     @RequestMapping(value ="/develop", method=RequestMethod.GET)
     public List<FileNode> scanFolder(@RequestParam("folder") String folder) {
         List<FileNode> fnt = new ArrayList<>();
@@ -40,6 +41,7 @@ public class DevelopController {
         return fnt;
     }
 
+    // 获取文件的具体信息
     @RequestMapping(value = "/develop/file", method = RequestMethod.GET)
     public FileInfo getFileInfo(@RequestParam("path") String path) {
         File myObj = new File(path);
@@ -61,6 +63,7 @@ public class DevelopController {
         return fileInfo;
     }
 
+    // 创建工程
     @PostMapping("/develop/project")
     public ProjectInfo createProject(@RequestBody ProjectInfo projectInfo) {
         System.out.println("get: " + projectInfo.getName());
@@ -70,7 +73,7 @@ public class DevelopController {
         else return null;
     }
 
-
+    // 编译工程
     @RequestMapping(value = "/develop/build", method = RequestMethod.GET)
     public BuildInfo buildProject(@RequestParam("path") String path) {
         String rst = BuildProcess.buildProject(path);
@@ -80,6 +83,7 @@ public class DevelopController {
         return bi;
     }
 
+    // 安装扩展
     @RequestMapping(value = "/develop/install/{name}", method = RequestMethod.GET)
     public String installExtension(@RequestParam("path") String path, @PathVariable("name") String name) {
         String rst = BuildProcess.installExtension(path, name);
@@ -87,6 +91,7 @@ public class DevelopController {
         return rst;
     }
 
+    // 创建文件
     @RequestMapping(value = "/develop/file/{name}", method = RequestMethod.GET)
     public String createFile(@RequestParam("path") String path, @PathVariable("name") String name) {
         return FileTools.createFile(path, name);

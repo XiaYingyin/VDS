@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import cn.ruc.xyy.jpev.repository.BarChartDataRepository;
 
+// 负责测试数据的读取
 @Service("barChartDataService")
 public class BarChartDataService {
     private BarChartDataRepository barChartDataRepository;

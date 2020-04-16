@@ -33,6 +33,7 @@ public class ExtensionController {
 	@Autowired
 	private BarChartDataService barChartDataService;
 
+	// 获取扩展列表
 	@RequestMapping(value ="/extension/list", method=RequestMethod.GET)
 	public List<ExtensionItem> getExtList(@RequestParam("type") String etype){
 		String ls_exts = "SELECT row_to_json(row) from (SELECT e.extname AS \"name\", t.etype AS \"type\", e.extversion AS \"version\", n.nspname AS \"schema\", c.description AS \"description\" "
@@ -64,6 +65,7 @@ public class ExtensionController {
 		return extList;
 	}
 
+	// 获取某个扩展的具体信息
 	@RequestMapping(value ="/extension/list/{ext_name}", method=RequestMethod.GET)
 	public ExtensionItem getExtInfo(@PathVariable("ext_name") String ext_name) {
 		String ext_info = "SELECT row_to_json(row) from (SELECT e.extname AS \"name\", t.etype AS \"type\", e.extversion AS \"version\", n.nspname AS \"schema\", c.description AS \"description\" "
@@ -110,6 +112,7 @@ public class ExtensionController {
 		return ext;
 	}
 
+	// 修改扩展信息
 	@PatchMapping(value ="/extension/list/{ext_name}")
 	public void updateExtInfo(@PathVariable("ext_name") String ext_name, @RequestParam("description") String description) {
 		String update_extInfo = "update pg_catalog.pg_description set description = '" + description + "'" +
@@ -131,7 +134,8 @@ public class ExtensionController {
 			return "Exception: " + de;
 		}
 	}*/
-	
+
+	// 安装扩展
 	@RequestMapping(value = "/ext/install/{ext_name}", method=RequestMethod.GET)
 	public String installExt(@PathVariable("ext_name") String ext_name) {
 		String install = "create extension " + ext_name;
@@ -142,7 +146,8 @@ public class ExtensionController {
 			return "Exception: " + de;
 		}
 	}
-	
+
+	// 卸载扩展
 	@RequestMapping(value = "/ext/uninstall/{ext_name}", method=RequestMethod.GET)
 	public String uninstallExt(@PathVariable("ext_name") String ext_name) {
 		String install = "drop extension " + ext_name;
@@ -154,6 +159,7 @@ public class ExtensionController {
 		}
 	}
 
+	// 测试扩展
 	@RequestMapping(value = "/extension/test/{name}", method = RequestMethod.GET)
 	public BarChartData getBarChartData(@PathVariable("name") String name){
 		BarChartData barChartData = new BarChartData();
@@ -202,6 +208,7 @@ public class ExtensionController {
 		return barChartData;
 	}
 
+	// 删除扩展
 	@DeleteMapping(value = "/extension/list/{name}")
 	public void deleteExt(@PathVariable("name") String name) {
 		String drop = "drop extension " + name;

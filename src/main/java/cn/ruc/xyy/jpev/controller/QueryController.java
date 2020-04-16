@@ -19,6 +19,8 @@ public class QueryController {
 		// TODO Auto-generated constructor stub
 	}
 
+	// 执行sql查询
+	// 已经不再使用
 	@RequestMapping(value ="/query/{sql}", method=RequestMethod.GET)
 	public String getQueryPlan(@PathVariable("sql") String sql){
 		sql = "EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON)" + sql;
@@ -27,6 +29,7 @@ public class QueryController {
 		return queryJSON;
 	}
 
+	// 执行sql查询
 	@RequestMapping(value = "/query", method=RequestMethod.GET)
 	public String ngetQueryPlan(@RequestParam("query") String query) {
 		query = "EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON) " + query;
